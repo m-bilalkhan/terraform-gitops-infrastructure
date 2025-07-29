@@ -46,20 +46,28 @@ module "vpc" {
 }
 
 module "s3_bucket" {
-  source      = "../modules/s3"
+  source      = "../../modules/s3"
   bucket_name = "${var.project_name}-${var.env}"
   env         = var.env
   project_name = var.project_name
 }
 
-resource aws_vpc_security_group_egress_rule "allow_all_outbound" {
-  vpc_id = module.vpc.vpc_id
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0/0"]
+resource "aws_vpc_security_group" "allow_all_outbound" {
+  name        = "${var.project_name}-${var.env}-sg"
+  description = "Allow all outbound traffic"
+  vpc_id      = module.vpc.vpc_id
+
+  tags = {
+    Name        = "${var.project_name}-${var.env}-sg"
+    Environment = var.env
   }
+}
+
+resource aws_vpc_security_group_egress_rule "allow_all_outbound_egress" {
+  security_group_id = aws_vpc_security_group.allow_all_outbound.id
+  ip_protocol = "-1"  # All protocols
+  from_port   = 0
+  to_port     = 0
   tags = {
     Name        = "${var.project_name}-${var.env}-sg-egress"
     Environment = var.env
@@ -78,13 +86,13 @@ data "aws_ami" "amzn-linux-2023-ami" {
 }
 
 module "ec2_instance" {
-  source = "../modules/ec2"
+  source = "../../modules/ec2"
 
   env                  = var.env
   project_name         = var.project_name
   ami_id               = data.aws_ami.amzn-linux-2023-ami.id
   instance_type        = "t2.micro"
-  vpc_security_group_ids = [aws_vpc_security_group_egress_rule.allow_all_outbound.id]
+  vpc_security_group_ids = [aws_vpc_security_group.allow_all_outbound.id]
   subnet_id            = module.vpc.public_subnets[0].id
 }
 
