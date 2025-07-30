@@ -1,27 +1,27 @@
 module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
+  source = "terraform-aws-modules/vpc/aws"
 
   name = "${var.project_name}-${var.env}-vpc"
   cidr = var.vpc_cidr_block
 
-  azs             = var.availability_zones
-  public_subnets  = var.public_subnets
+  azs            = var.availability_zones
+  public_subnets = var.public_subnets
 
   public_subnet_tags = {
-    Name = "${var.project_name}-${var.env}-public-subnet"
+    Name        = "${var.project_name}-${var.env}-public-subnet"
     Terraform   = "true"
     Environment = var.env
   }
 
   private_subnet_tags = {
-    Name = "${var.project_name}-${var.env}-private-subnet"
+    Name        = "${var.project_name}-${var.env}-private-subnet"
     Terraform   = "true"
     Environment = var.env
   }
 
-  enable_dns_hostnames = true
-  enable_nat_gateway = true
-  single_nat_gateway = true
+  enable_dns_hostnames   = true
+  enable_nat_gateway     = true
+  single_nat_gateway     = true
   one_nat_gateway_per_az = false
 
   create_egress_only_igw = true
@@ -46,13 +46,13 @@ module "vpc" {
 }
 
 module "s3_bucket" {
-  source      = "../../modules/s3"
-  bucket_name = "${var.project_name}-${var.env}"
-  env         = var.env
+  source       = "../../modules/s3"
+  bucket_name  = "${var.project_name}-${var.env}"
+  env          = var.env
   project_name = var.project_name
 }
 
-resource "aws_vpc_security_group" "allow_all_outbound" {
+resource "aws_security_group" "allow_all_outbound" {
   name        = "${var.project_name}-${var.env}-sg"
   description = "Allow all outbound traffic"
   vpc_id      = module.vpc.vpc_id
@@ -63,11 +63,12 @@ resource "aws_vpc_security_group" "allow_all_outbound" {
   }
 }
 
-resource aws_vpc_security_group_egress_rule "allow_all_outbound_egress" {
-  security_group_id = aws_vpc_security_group.allow_all_outbound.id
-  ip_protocol = "-1"  # All protocols
-  from_port   = 0
-  to_port     = 0
+resource "aws_vpc_security_group_egress_rule" "allow_all_outbound_egress" {
+  security_group_id = aws_security_group.allow_all_outbound.id
+  ip_protocol       = "-1" # All protocols
+  from_port         = 0
+  to_port           = 0
+  cidr_ipv4         = "0.0.0.0/0" # Allow all outbound traffic
   tags = {
     Name        = "${var.project_name}-${var.env}-sg-egress"
     Environment = var.env
@@ -88,15 +89,15 @@ data "aws_ami" "amzn-linux-2023-ami" {
 module "ec2_instance" {
   source = "../../modules/ec2"
 
-  env                  = var.env
-  project_name         = var.project_name
-  ami_id               = data.aws_ami.amzn-linux-2023-ami.id
-  instance_type        = "t2.micro"
-  vpc_security_group_ids = [aws_vpc_security_group.allow_all_outbound.id]
-  subnet_id            = module.vpc.public_subnets[0].id
+  env                    = var.env
+  project_name           = var.project_name
+  ami_id                 = data.aws_ami.amzn-linux-2023-ami.id
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.allow_all_outbound.id]
+  subnet_id              = module.vpc.public_subnets[0].id
 }
 
-output instance_public_ip {
+output "instance_public_ip" {
   value       = module.ec2_instance.instance_public_ip
   description = "Public IP of the EC2 instance"
 }
