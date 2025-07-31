@@ -27,8 +27,14 @@ module "vpc" {
   enable_dns_hostnames   = true
   enable_nat_gateway     = true
   single_nat_gateway     = true
-  one_nat_gateway_per_az = true
-  create_egress_only_igw = true
+  create_multiple_intra_route_tables = true
+  propagate_intra_route_tables_vgw = true
+
+  nat_gateway_tags = {
+    Name        = "${var.project_name}-${var.env}-nat"
+    Terraform   = "true"
+    Environment = var.env
+  }
 
   igw_tags = {
     Name        = "${var.project_name}-${var.env}-igw"
@@ -42,6 +48,12 @@ module "vpc" {
     Environment = var.env
   }
 
+  private_route_table_tags = {
+    Name        = "${var.project_name}-${var.env}-private-rtb"
+    Terraform   = "true"
+    Environment = var.env
+  }
+
   tags = {
     Name        = "${var.project_name}-${var.env}-vpc"
     Terraform   = "true"
@@ -49,12 +61,12 @@ module "vpc" {
   }
 }
 
-module "s3_bucket" {
-  source       = "../../modules/s3"
-  bucket_name  = "${var.project_name}-${var.env}"
-  env          = var.env
-  project_name = var.project_name
-}
+# module "s3_bucket" {
+#   source       = "../../modules/s3"
+#   bucket_name  = "${var.project_name}-${var.env}"
+#   env          = var.env
+#   project_name = var.project_name
+# }
 
 resource "aws_security_group" "allow_all_outbound" {
   name        = "${var.project_name}-${var.env}-sg"
@@ -92,7 +104,7 @@ data "aws_ami" "amzn-linux-2023-ami" {
 
 module "ec2_instance" {
   source                 = "../../modules/ec2"
-  instance_count         = 1
+  instance_count         = 3
   ami_id                 = data.aws_ami.amzn-linux-2023-ami.id
   vpc_security_group_ids = [aws_security_group.allow_all_outbound.id]
   private_subnet_ids     = module.vpc.private_subnets
