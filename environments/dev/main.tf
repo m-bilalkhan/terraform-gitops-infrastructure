@@ -91,18 +91,24 @@ data "aws_ami" "amzn-linux-2023-ami" {
 }
 
 module "ec2_instance" {
-  source = "../../modules/ec2"
-
-  for_each               = toset(module.vpc.private_subnets)
-  env                    = var.env
-  project_name           = var.project_name
+  source                 = "../../modules/ec2"
+  instance_count         = 1
   ami_id                 = data.aws_ami.amzn-linux-2023-ami.id
-  instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.allow_all_outbound.id]
-  subnet_id              = each.key
+  private_subnet_ids     = module.vpc.private_subnets
+  availability_zones     = var.availability_zones
+
+  env          = var.env
+  project_name = var.project_name
+  tags = {
+    Environment = var.env
+  }
 }
 
-output "instance_public_ip" {
-  value       = module.ec2_instance.instance_public_ip
-  description = "Public IP of the EC2 instance"
+output "ec2_instance_ids" {
+  value = module.ec2_instance.instance_ids
+}
+
+output "ec2_instance_private_ips" {
+  value = module.ec2_instance.private_ips
 }

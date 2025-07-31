@@ -1,9 +1,7 @@
-output "instance_id" {
-  value       = aws_instance.instance.id
-  description = "The ID of the EC2 instance created by this module"
+output "instance_ids" {
+  value = aws_instance.instance[*].id
 }
 
-output "instance_public_ip" {
-  value       = aws_instance.instance.public_ip
-  description = "The public IP address of the EC2 instance"
+output "private_ips" {
+  value = aws_instance.instance[*].private_ip
 }

@@ -25,7 +25,26 @@ variable "vpc_security_group_ids" {
   default     = []
 }
 
-variable "subnet_id" {
-  description = "Subnet ID for the EC2 instance"
-  type        = string
+variable "private_subnet_ids" {
+  description = "List of private subnet IDs for the EC2 instance"
+  type        = list(string)
+  default     = []
+}
+
+variable "availability_zones" {
+  description = "List of availability zones for the EC2 instance"
+  type        = list(string)
+  default     = []
+}
+
+variable "tags" {
+  description = "Tags to apply to the EC2 instance"
+  type        = map(string)
+  default     = {}
+}
+
+variable "instance_count" {
+  description = "Number of EC2 instances to create"
+  type        = number
+  default     = 1
 }
