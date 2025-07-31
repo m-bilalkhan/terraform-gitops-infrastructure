@@ -8,8 +8,9 @@ module "vpc" {
   name = "${var.project_name}-${var.env}-vpc"
   cidr = var.vpc_cidr_block
 
-  azs            = var.availability_zones
-  public_subnets = var.public_subnets
+  azs             = var.availability_zones
+  public_subnets  = var.public_subnets
+  private_subnets = var.private_subnets
 
   public_subnet_tags = {
     Name        = "${var.project_name}-${var.env}-public-subnet"
@@ -17,7 +18,11 @@ module "vpc" {
     Environment = var.env
   }
 
-  private_subnets = [] # No private subnets defined
+  private_subnet_tags = {
+    Name        = "${var.project_name}-${var.env}-private-subnet"
+    Terraform   = "true"
+    Environment = var.env
+  }
 
   enable_dns_hostnames   = true
   enable_nat_gateway     = true
@@ -88,7 +93,7 @@ data "aws_ami" "amzn-linux-2023-ami" {
 module "ec2_instance" {
   source = "../../modules/ec2"
 
-  for_each               = toset(module.vpc.public_subnets)
+  for_each               = toset(module.vpc.private_subnets)
   env                    = var.env
   project_name           = var.project_name
   ami_id                 = data.aws_ami.amzn-linux-2023-ami.id

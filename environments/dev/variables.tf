@@ -23,6 +23,11 @@ variable "public_subnets" {
   description = "List of public subnets for the VPC"
 }
 
+variable "private_subnets" {
+  type        = list(string)
+  description = "List of private subnets for the VPC"
+}
+
 variable "aws_region" {
   type        = string
   description = "AWS region where resources will be created"
