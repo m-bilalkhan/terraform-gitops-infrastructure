@@ -17,17 +17,12 @@ module "vpc" {
     Environment = var.env
   }
 
-  private_subnet_tags = {
-    Name        = "${var.project_name}-${var.env}-private-subnet"
-    Terraform   = "true"
-    Environment = var.env
-  }
+  private_subnets = [] # No private subnets defined
 
   enable_dns_hostnames   = true
   enable_nat_gateway     = true
   single_nat_gateway     = true
-  one_nat_gateway_per_az = false
-
+  one_nat_gateway_per_az = true
   create_egress_only_igw = true
 
   igw_tags = {
@@ -93,12 +88,13 @@ data "aws_ami" "amzn-linux-2023-ami" {
 module "ec2_instance" {
   source = "../../modules/ec2"
 
+  for_each               = toset(module.vpc.public_subnets)
   env                    = var.env
   project_name           = var.project_name
   ami_id                 = data.aws_ami.amzn-linux-2023-ami.id
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.allow_all_outbound.id]
-  subnet_id              = module.vpc.public_subnets[0].id
+  subnet_id              = each.key
 }
 
 output "instance_public_ip" {
