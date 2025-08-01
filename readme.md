@@ -26,14 +26,17 @@
 
 ```
 .
-├── modules/           # Reusable Terraform modules (e.g., vpc, s3, ec2)
+├── modules/           # Reusable Terraform modules EC2
 ├── environments/
 │   ├── dev/           # Dev environment configuration
 │   └── prod/          # Prod environment configuration
-├── .github/           # GitHub Actions workflows (CI/CD)
+├── .github/          
 ├── README.md
 └── ...
 ```
+
+## AWS Structure
+: ![AWS Structure](images/terraform-gitops-infrastructure.drawio.svg)
 
 ## Getting Started
 
