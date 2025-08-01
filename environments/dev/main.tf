@@ -24,11 +24,11 @@ module "vpc" {
     Environment = var.env
   }
 
-  enable_dns_hostnames   = true
-  enable_nat_gateway     = true
-  single_nat_gateway     = true
-  create_multiple_intra_route_tables = true
-  propagate_intra_route_tables_vgw = true
+  enable_nat_gateway            = true
+  single_nat_gateway            = true
+  manage_default_route_table    = false
+  manage_default_security_group = false
+  manage_default_network_acl    = false
 
   nat_gateway_tags = {
     Name        = "${var.project_name}-${var.env}-nat"
@@ -81,7 +81,7 @@ resource "aws_security_group" "allow_all_outbound" {
 
 resource "aws_vpc_security_group_egress_rule" "allow_all_outbound_egress" {
   security_group_id = aws_security_group.allow_all_outbound.id
-  ip_protocol       = "-1" # All protocols
+  ip_protocol       = "-1"        # All protocols
   cidr_ipv4         = "0.0.0.0/0" # Allow all outbound traffic
   tags = {
     Name        = "${var.project_name}-${var.env}-sg-egress"
