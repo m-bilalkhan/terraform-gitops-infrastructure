@@ -21,6 +21,7 @@
   - Environment isolation (separate state and configuration for dev/prod)
   - State isolation per environment
   - Automation and security best practices
+  - SSM Connection To Configure Private Instances
 
 ## Project Structure
 
