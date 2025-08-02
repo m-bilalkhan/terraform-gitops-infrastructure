@@ -32,3 +32,8 @@ variable "aws_region" {
   type        = string
   description = "AWS region where resources will be created"
 }
+
+variable "role_name" {
+  description = "Name of Rule to Attach"
+  type        = string
+}

@@ -48,3 +48,8 @@ variable "instance_count" {
   type        = number
   default     = 1
 }
+
+variable "role_name" {
+  description = "Name of Rule to Attach"
+  type        = string
+}

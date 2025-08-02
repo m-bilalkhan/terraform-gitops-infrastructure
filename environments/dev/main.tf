@@ -102,11 +102,13 @@ data "aws_ami" "amzn-linux-2023-ami" {
 
 module "ec2_instance" {
   source                 = "../../modules/ec2"
-  instance_count         = 3
+  instance_count         = 2
   ami_id                 = data.aws_ami.amzn-linux-2023-ami.id
   vpc_security_group_ids = [aws_security_group.allow_all_outbound.id]
   private_subnet_ids     = module.vpc.private_subnets
   availability_zones     = var.availability_zones
+  role_name              = var.role_name
+  
 
   env          = var.env
   project_name = var.project_name
