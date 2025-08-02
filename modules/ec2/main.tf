@@ -7,7 +7,7 @@ resource "aws_instance" "instance" {
   count                  = var.instance_count
   ami                    = var.ami_id
   instance_type          = var.instance_type
-  iam_instance_profile   = data.aws_iam_instance_profile.existing_ssm_role
+  iam_instance_profile   = data.aws_iam_instance_profile.existing_ssm_role.name
 
   vpc_security_group_ids = var.vpc_security_group_ids
 
