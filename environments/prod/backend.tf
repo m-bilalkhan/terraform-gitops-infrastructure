@@ -4,7 +4,7 @@ terraform {
     project      = "terraform-gitops-infrastructure"
 
     workspaces {
-      name = "gitops-dev-ap-south-1"
+      name = "gitops-prod-ap-south-1"
     }
   }
 }
