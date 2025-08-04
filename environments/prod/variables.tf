@@ -1,0 +1,39 @@
+variable "project_name" {
+  type        = string
+  description = "Name of the project, used for naming resources"
+}
+
+variable "env" {
+  type        = string
+  description = "environment"
+}
+
+variable "vpc_cidr_block" {
+  type        = string
+  description = "CIDR block for the VPC"
+}
+
+variable "availability_zones" {
+  type        = list(string)
+  description = "List of availability zones for the VPC"
+}
+
+variable "public_subnets" {
+  type        = list(string)
+  description = "List of public subnets for the VPC"
+}
+
+variable "private_subnets" {
+  type        = list(string)
+  description = "List of private subnets for the VPC"
+}
+
+variable "aws_region" {
+  type        = string
+  description = "AWS region where resources will be created"
+}
+
+variable "role_name" {
+  description = "Name of Rule to Attach"
+  type        = string
+}
